@@ -7,7 +7,8 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 # Read the SpaceX launch data into pandas dataframe
-spacex_df = pd.read_csv("spacex_launch_dash.csv")
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/spacex_launch_dash.csv"
+spacex_df = pd.read_csv(url)
 max_payload = spacex_df['Payload Mass (kg)'].max()
 min_payload = spacex_df['Payload Mass (kg)'].min()
 
@@ -79,8 +80,13 @@ def update_pie_chart(selected_site):
         fig = px.pie(spacex_df, values='class', names='Launch Site', title='Total Success Launches for All Sites')
     else:
         filtered_df = spacex_df[spacex_df['Launch Site'] == selected_site]
-        fig = px.pie(filtered_df, values='class', names='class', title=f'Success vs. Failure Count for {selected_site}')
-        fig.update_traces(textinfo='percent+label')
+        success_count = filtered_df[filtered_df['class'] == 1].shape[0]
+        failure_count = filtered_df[filtered_df['class'] == 0].shape[0]
+        fig = px.pie(
+            names=['Success', 'Failure'],
+            values=[success_count, failure_count],
+            title=f'Success vs. Failure Count for {selected_site}'
+        )
     return fig
 
 # TASK 4:
